@@ -1,6 +1,8 @@
 ﻿/**
  * @File Driver.cs
  * @Brief A program the sends data between nodes using sockets
+ * This file is responsible for creating threads and nodes, running
+ * them and printing when they finish
  * 
  * @Author Forest Thomas
  * @Date Fall 2015

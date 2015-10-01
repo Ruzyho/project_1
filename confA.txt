@@ -8,7 +8,7 @@ these lines are
 only here
 to make the length
 of this file
-un-usually long
+unusually long
 to test that
 the program will still work
 even when there are many

@@ -45,9 +45,15 @@ namespace Nodes
 			}
 			NetworkStream stream = client.GetStream ();
 			byte[] toBytes;
-			msg = sr.ReadToEnd ();
-			toBytes = Encoding.ASCII.GetBytes (msg);
-			stream.Write (toBytes, 0, toBytes.Length);
+			char[] chars = new char[100];
+			int read = sr.Read(chars, 0, 100);
+			while (read != 0) {
+				toBytes = System.Text.Encoding.ASCII.GetBytes (chars);	
+				stream.Write (toBytes, 0, read);
+				read = sr.Read (chars, 0, 100);
+			}
+			msg = "terminate";
+			stream.Write (System.Text.Encoding.ASCII.GetBytes(msg), 0, msg.Length);
 			client.Close ();
 
 		}
@@ -80,14 +86,19 @@ namespace Nodes
 			listener.Start ();
 			TcpClient client = listener.AcceptTcpClient ();
 			NetworkStream stream = client.GetStream ();
-			int i;
 			Byte[] bytes = new Byte[256];
 			System.Console.WriteLine ("Node B recieved: ");
-			while ((i = stream.Read(bytes, 0, bytes.Length)) != 0) {
-				msg = System.Text.Encoding.ASCII.GetString (bytes, 0, i);
-				System.Console.Write (msg);
+			int read = stream.Read (bytes, 0, bytes.Length);
+			msg = System.Text.Encoding.ASCII.GetString (bytes, 0, read);
+			while (!msg.EndsWith("terminate")) {
+				if (read != 0)
+					System.Console.Write (msg);
+				else
+					System.Console.Write (msg);
+				read = stream.Read (bytes, 0, bytes.Length);
+				msg = System.Text.Encoding.ASCII.GetString (bytes, 0, read);
 			}
-			System.Console.Write ("\n");
+			System.Console.Write (msg.Remove (read - 9) + "\n");
 			client.Close ();
 
 			/* Transmitting to node C */
@@ -99,9 +110,16 @@ namespace Nodes
 			}
 			stream = client.GetStream ();
 			byte[] toBytes;
-			msg = sr.ReadToEnd ();
-			toBytes = Encoding.ASCII.GetBytes (msg);
-			stream.Write (toBytes, 0, toBytes.Length);
+			char[] chars = new char[100];
+			read = sr.Read(chars, 0, 100);
+			/* keep listening until message ends with terminate */
+			while (read != 0) {
+				toBytes = System.Text.Encoding.ASCII.GetBytes (chars);	
+				stream.Write (toBytes, 0, read);
+				read = sr.Read (chars, 0, 100);
+			}
+			msg = "terminate";
+			stream.Write (System.Text.Encoding.ASCII.GetBytes(msg), 0, msg.Length);
 			client.Close ();
 		}
 	}
@@ -130,14 +148,20 @@ namespace Nodes
 			listener.Start ();
 			TcpClient client = listener.AcceptTcpClient ();
 			NetworkStream stream = client.GetStream ();
-			int i;
 			Byte[] bytes = new Byte[256];
 			System.Console.WriteLine ("Node C recieved: ");
-			while ((i = stream.Read(bytes, 0, bytes.Length)) != 0) {
-				msg = System.Text.Encoding.ASCII.GetString (bytes, 0, i);
-				System.Console.Write (msg);
+			int read = stream.Read (bytes, 0, bytes.Length);
+			msg = System.Text.Encoding.ASCII.GetString (bytes, 0, read);
+			/* keep listening until message ends with terminate */
+			while (!msg.EndsWith("terminate")) {
+				if (read != 0)
+					System.Console.Write (msg);
+				else
+					System.Console.Write (msg);
+				read = stream.Read (bytes, 0, bytes.Length);
+				msg = System.Text.Encoding.ASCII.GetString (bytes, 0, read);
 			}
-			System.Console.Write ("\n");
+			System.Console.Write (msg.Remove (read - 9) + "\n");
 			client.Close ();
 		}
 	}

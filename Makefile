@@ -1,4 +1,4 @@
-CC=gmcs
+CC=mcs
 
 all: Driver
 
